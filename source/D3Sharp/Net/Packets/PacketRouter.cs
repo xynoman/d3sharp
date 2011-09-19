@@ -64,7 +64,7 @@ namespace D3Sharp.Net.Packets
         private static void SendResponse(IClient client, int requestId, IMessage message)
         {
             var packet = new Packet(
-                new Header(0xfe, 0x0, requestId, (uint)message.SerializedSize),
+                new Header(0xfe, 0x0, requestId, (uint)message.SerializedSize, 0),
                 message.ToByteArray());
 
             client.Send(packet);

@@ -37,8 +37,7 @@ namespace D3Sharp.Net
             this.Services = new Dictionary<uint, uint>();
         }
 
-        // rpc to client
-        public void CallMethod(MethodDescriptor method, IRpcController controller, IMessage request, IMessage responsePrototype, Action<IMessage> done)
+        public void CallMethod(MethodDescriptor method, IRpcController controller, IMessage request, IMessage responsePrototype, Action<IMessage> done, ulong objectId)
         {
             var serviceName = method.Service.FullName;
             var serviceHash = StringHashHelper.HashString(serviceName);
@@ -51,10 +50,16 @@ namespace D3Sharp.Net
 
             var serviceId = this.Services[serviceHash];
             var packet = new Packet(
-                new Header((byte) serviceId, (uint)(method.Index + 1), this._requestCounter++, (uint) request.SerializedSize),
+                new Header((byte)serviceId, (uint)(method.Index + 1), this._requestCounter++, (uint)request.SerializedSize, objectId),
                 request.ToByteArray());
 
             this.Send(packet);
+        }
+
+        // rpc to client
+        public void CallMethod(MethodDescriptor method, IRpcController controller, IMessage request, IMessage responsePrototype, Action<IMessage> done)
+        {
+            this.CallMethod(method, controller, request, responsePrototype, done, 0);
         }      
 
         #region socket stuff

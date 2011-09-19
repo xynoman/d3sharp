@@ -14,18 +14,18 @@ namespace D3Sharp.Net.Packets
         public byte ServiceID { get; set; }
         public uint MethodID { get; set; }
         public int RequestID { get; set; }
-        public ulong Unknown { get; set; }
+        public ulong ObjectID { get; set; }
         public uint PayloadLength { get; set; }
 
         public Header()
-        {            
-            this.Unknown = 0x00;
+        {
+            this.ObjectID = 0x00;
             this.PayloadLength = 0x00;
         }
 
-        public Header(byte serviceId, uint methodId, int requestId, uint payloadLenght)
+        public Header(byte serviceId, uint methodId, int requestId, uint payloadLenght, ulong objectId)
         {
-            this.SetData(serviceId, methodId, requestId, payloadLenght);
+            this.SetData(serviceId, methodId, requestId, payloadLenght, objectId);
         }
 
         public Header(CodedInputStream stream)
@@ -33,18 +33,20 @@ namespace D3Sharp.Net.Packets
             var serviceId = stream.ReadRawByte();
             var methodId = stream.ReadRawVarint32();
             var requestId = stream.ReadRawByte() | (stream.ReadRawByte() << 8);
-            if (serviceId != 0xfe) this.Unknown = stream.ReadRawVarint64();
+            var objectId = 0UL;
+
+            if (serviceId != 0xfe) objectId = stream.ReadRawVarint64();
             var payloadLength = stream.ReadRawVarint32();
 
-            this.SetData(serviceId, methodId, requestId, payloadLength);
+            this.SetData(serviceId, methodId, requestId, payloadLength, objectId);
         }
 
-        private void SetData(byte serviceId, uint methodId, int requestId, uint payloadLenght)
+        private void SetData(byte serviceId, uint methodId, int requestId, uint payloadLenght, ulong objectId)
         {
             this.ServiceID = serviceId;
             this.MethodID = methodId;
             this.RequestID = requestId;
-            this.Unknown = 0x0;
+            this.ObjectID = objectId;
             this.PayloadLength = payloadLenght;
 
             this.Data = this.ServiceID != 0xfe ? new byte[6] : new byte[5];
@@ -56,7 +58,7 @@ namespace D3Sharp.Net.Packets
                 output.WriteRawVarint32(this.MethodID);
                 output.WriteRawByte((byte)(this.RequestID & 0xff));
                 output.WriteRawByte((byte)(this.RequestID >> 8));
-                if (serviceId != 0xfe) output.WriteRawVarint64(this.Unknown);
+                if (serviceId != 0xfe) output.WriteRawVarint64(this.ObjectID);
                 output.WriteRawVarint32(this.PayloadLength);
                 output.Flush();
 

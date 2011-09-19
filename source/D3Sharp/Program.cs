@@ -16,6 +16,15 @@ namespace D3Sharp
 
         public static void Main(string[] args)
         {
+            ////var y = D3Sharp.Utils.Helpers.StringHashHelper.HashString("bnet.protocol.game_master.GameFactorySubscriber");
+
+            ////var x = bnet.protocol.game_master.GameMasterSubscriber.Descriptor.FindMethodByName("NotifyFactoryUpdate");
+            ////x = bnet.protocol.notification.NotificationListener.Descriptor.FindMethodByName("");
+
+            ////var serviceName = x.Service.FullName;
+            ////var serviceHash = D3Sharp.Utils.Helpers.StringHashHelper.HashString(serviceName);
+
+
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler; // watch for unhandled-exceptions.
 
             LogManager.Enabled = true; // enable the logger.
